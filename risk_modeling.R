@@ -82,6 +82,8 @@ var_oneday <- function(lists,hd,a)
     variance_0 = variance_1
     i = i + 1
   }
+  data = list("variance" = variance, "one day var" = var)
+  return(data)
 }
 
 # general histogram function
@@ -115,6 +117,9 @@ conf = 0.95
 # pulls var calculations
 var_m = var_calc(data_m,conf)
 var_c = var_calc(data_c,conf)
+
+main = var_oneday(data_m,data_mh,conf)
+comp = var_oneday(data_m,data_mh,conf)
 
 #---------------------graphing---------------------#
 
