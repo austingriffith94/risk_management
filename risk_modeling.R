@@ -46,18 +46,28 @@ data_c = read_func(file2,invest)
 conf = 0.95
 
 #function to calculate $var
-var_calc <- function(list,a)
+var_calc <- function(lists,a)
 {
-  r_vec = data_m$returns
+  r_vec = lists$returns
   
   vol = sd(r_vec)
   avg_ret = mean(r_vec)
   
-  par_var = abs(qnorm(1-a,0,1)*vol*data_m$port_val)
-  hist_var = abs(quantile(r_vec,1-a)*data_m$port_val)
+  par_var = abs(qnorm(1-a,0,1)*vol*lists$port_val)
+  hist_var = abs(quantile(r_vec,1-a)*lists$port_val)
   data = list("par" = par_var, "hist" = hist_var)
   return(data)
 }
 
 var_calc(data_m,conf)
 
+
+vec_hist <- function(x)
+{
+  h = hist(x, breaks=25, col="red", xlab="Daily Returns", 
+          main="Histogram with Normal Curve") 
+  xfit = seq(min(x),max(x),length=40) 
+  yfit = dnorm(xfit, mean=mean(x), sd=sd(x)) 
+  yfit = yfit*diff(h$mids[1:2])*length(x) 
+  lines(xfit, yfit, col="blue", lwd=2)
+}
