@@ -7,16 +7,26 @@
 setwd("C:/Users/Austin/GIT_profile/risk_management")
 getwd()
 
-# import data
-ret = read.csv("returns_main.csv", header=TRUE)
-ret_c = read.csv("returns_comp.csv", header=TRUE)
+file1 = "returns_main"
+file2 = "returns_comp"
 
-# sum return percentages by day
-# assumed equal investment in each firm
-ret_sum = aggregate(.~DATE, data=ret, FUN=sum)
-keeps = c("RET")
-ret_sum = subset(ret_sum, select = keeps)
+read_func <- function(value)
+{
+  # import data
+  filename = paste(value, ".csv", sep="")
+  ret = read.csv(filename, header=TRUE)
+  
+  # sum return percentages by day
+  # assumed equal investment in each firm
+  ret_sum = aggregate(.~DATE, data=ret, FUN=sum)
+  keeps = c("RET")
+  ret_sum = subset(ret_sum, select = keeps)
+  ret_vec = ret_sum[["RET"]]
+}
 
-i = 1 
+returns = read_func(file1)
+returns_comp = read_func(file2)
+i = 1
+
 
 
