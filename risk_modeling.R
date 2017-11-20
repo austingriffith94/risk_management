@@ -11,6 +11,7 @@ file1 = "returns_main"
 file2 = "returns_comp"
 
 # import data
+# returns are in %
 # sum return percentages by day
 # assumed equal investment in each firm
 read_func <- function(value)
@@ -27,12 +28,11 @@ read_func <- function(value)
 }
 
 #reads files, gets vector of returns
-returns = read_func(file1)
-returns_comp = read_func(file2)
+r_vec = read_func(file1)
+rc_vec = read_func(file2)
 
 
 
-i = 1
-
-
-
+data = c(length(r_vec),mean(r_vec),sd(r_vec),252*mean(r_vec))
+names(data) = c("Total Days","Daily Return","Daily Vol","Annual Return")
+data
