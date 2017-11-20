@@ -32,7 +32,7 @@ read_func <- function(value, I)
   i = 1
   while(i < length(ret_vec))
   {
-    ret_vec[i] = ret_vec[i]
+    ret_vec[i] = ret_vec[i]/count
     i = i + 1
   }
   
@@ -51,4 +51,5 @@ conf = 0.95
 vol = sd(r_vec)
 avg_ret = mean(r_vec)
 
-parvar = abs(qnorm(1-conf,0,1)*vol)
+par_var = abs(qnorm(1-conf,0,1)*vol*data_m$port_val)
+hist_var = abs(quantile(r_vec,1-conf)*data_m$port_val)
