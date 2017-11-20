@@ -41,13 +41,17 @@ read_func <- function(value, I)
 var_calc <- function(lists,a)
 {
   r_vec = lists$returns
+  port = lists$port_val
   
   vol = sd(r_vec)
   avg_ret = mean(r_vec)
   
-  par_var = abs(qnorm(1-a,0,1)*vol*lists$port_val)
-  hist_var = abs(quantile(r_vec,1-a)*lists$port_val)
-  data = list("par" = par_var, "hist" = hist_var)
+  var = abs(quantile(r_vec,1-a))
+  dol_var = port*(1-exp(-var))
+  par_var = abs(qnorm(1-a,0,1)*vol*port)
+  hist_var = abs(quantile(r_vec,1-a)*port)
+  data = list("var"=var, "dollar"=dol_var, "par"=par_var, 
+              "hist"=hist_var)
   return(data)
 }
 
@@ -72,6 +76,7 @@ file2 = "returns_comp"
 data_m = read_func(file1,invest)
 data_c = read_func(file2,invest)
 
+#confidence interval for var
 conf = 0.95
 
 # pulls var calculations
