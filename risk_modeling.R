@@ -59,15 +59,24 @@ var_calc <- function(lists,a)
   return(data)
 }
 
-var_calc(data_m,conf)
+var_m = var_calc(data_m,conf)
+var_c = var_calc(data_C,conf)
 
+# lists with labels for histograms
+chart_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
+                    "xlabel" = "Daily Returns")
+chart_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
+                    "xlabel" = "Daily Returns")
 
-vec_hist <- function(x)
+vec_hist <- function(x, names)
 {
-  h = hist(x, breaks=25, col="red", xlab="Daily Returns", 
-          main="Histogram with Normal Curve") 
+  h = hist(x, breaks=(length(x)/50), col="red", xlab=names$xlabel, 
+          main=names$title) 
   xfit = seq(min(x),max(x),length=40) 
   yfit = dnorm(xfit, mean=mean(x), sd=sd(x)) 
   yfit = yfit*diff(h$mids[1:2])*length(x) 
   lines(xfit, yfit, col="blue", lwd=2)
 }
+
+vec_hist(data_m$returns, chart_returns_m)
+vec_hist(data_c$returns, chart_returns_c)
