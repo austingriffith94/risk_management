@@ -7,9 +7,7 @@
 setwd("C:/Users/Austin/GIT_profile/risk_management")
 getwd()
 
-invest = 1000000 # investment per firm
-file1 = "returns_main"
-file2 = "returns_comp"
+#---------------------functions---------------------#
 
 # import data
 # returns are in %
@@ -39,13 +37,7 @@ read_func <- function(value, I)
   return(data)
 }
 
-#reads files, gets list of returns and value
-data_m = read_func(file1,invest)
-data_c = read_func(file2,invest)
-
-conf = 0.95
-
-#function to calculate $var
+#function to calculate var
 var_calc <- function(lists,a)
 {
   r_vec = lists$returns
@@ -59,15 +51,7 @@ var_calc <- function(lists,a)
   return(data)
 }
 
-var_m = var_calc(data_m,conf)
-var_c = var_calc(data_C,conf)
-
-# lists with labels for histograms
-chart_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
-                    "xlabel" = "Daily Returns")
-chart_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
-                    "xlabel" = "Daily Returns")
-
+# general histogram function
 vec_hist <- function(x, names)
 {
   h = hist(x, breaks=(length(x)/50), col="red", xlab=names$xlabel, 
@@ -78,5 +62,28 @@ vec_hist <- function(x, names)
   lines(xfit, yfit, col="blue", lwd=2)
 }
 
+#---------------------start of code---------------------#
+
+invest = 1000000 # investment per firm
+file1 = "returns_main"
+file2 = "returns_comp"
+
+#reads files, gets list of returns and value
+data_m = read_func(file1,invest)
+data_c = read_func(file2,invest)
+
+conf = 0.95
+
+# pulls var calculations
+var_m = var_calc(data_m,conf)
+var_c = var_calc(data_C,conf)
+
+# lists with labels for histograms
+chart_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
+                       "xlabel" = "Daily Returns")
+chart_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
+                       "xlabel" = "Daily Returns")
+
+# write histograms for historical returns
 vec_hist(data_m$returns, chart_returns_m)
 vec_hist(data_c$returns, chart_returns_c)
