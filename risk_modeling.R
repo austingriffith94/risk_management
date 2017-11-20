@@ -14,9 +14,9 @@ ret_c = read.csv("returns_comp.csv", header=TRUE)
 # sum return percentages by day
 # assumed equal investment in each firm
 ret_sum = aggregate(.~DATE, data=ret, FUN=sum)
+keeps = c("RET")
+ret_sum = subset(ret_sum, select = keeps)
 
-# VAR
-len = length(ret)
-i = 1
-rend = c(0)
+i = 1 
+
 
