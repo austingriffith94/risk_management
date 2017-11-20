@@ -35,21 +35,29 @@ read_func <- function(value, I)
     ret_vec[i] = ret_vec[i]/count
     i = i + 1
   }
-  
   data = list("port_val" = port, "returns" = ret_vec)
-  
   return(data)
 }
 
-#reads files, gets vector of returns
+#reads files, gets list of returns and value
 data_m = read_func(file1,invest)
 data_c = read_func(file2,invest)
-r_vec = data_m$returns
-r_comp = data_c$returns
+
 conf = 0.95
 
-vol = sd(r_vec)
-avg_ret = mean(r_vec)
+#function to calculate $var
+var_calc <- function(list,a)
+{
+  r_vec = data_m$returns
+  
+  vol = sd(r_vec)
+  avg_ret = mean(r_vec)
+  
+  par_var = abs(qnorm(1-a,0,1)*vol*data_m$port_val)
+  hist_var = abs(quantile(r_vec,1-a)*data_m$port_val)
+  data = list("par" = par_var, "hist" = hist_var)
+  return(data)
+}
 
-par_var = abs(qnorm(1-conf,0,1)*vol*data_m$port_val)
-hist_var = abs(quantile(r_vec,1-conf)*data_m$port_val)
+var_calc(data_m,conf)
+
