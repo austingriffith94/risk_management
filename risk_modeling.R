@@ -33,6 +33,7 @@ read_func <- function(value, I)
     ret_vec[i] = ret_vec[i]/count
     i = i + 1
   }
+  
   data = list("port_val" = port, "returns" = ret_vec)
   return(data)
 }
@@ -50,9 +51,37 @@ var_calc <- function(lists,a)
   dol_var = port*(1-exp(-var))
   par_var = abs(qnorm(1-a,0,1)*vol*port)
   hist_var = abs(quantile(r_vec,1-a)*port)
-  data = list("var"=var, "dollar"=dol_var, "par"=par_var, 
-              "hist"=hist_var)
+
+  data = list("VaR"=var, "$VaR"=dol_var, "Parametric"=par_var, 
+              "Historical"=hist_var)
   return(data)
+}
+
+# one day var calculations
+var_oneday <- function(lists,hd,a)
+{
+  r_vec = lists$returns
+  port = lists$port_val
+  hist = hd$returns
+  
+  #initial variance using historical data
+  variance_0 = var(hist)
+  
+  #variables for while loop
+  lamda = 0.94
+  i = 1
+  variance = c(0)
+  var = c(0)
+  while(i < length(r_vec))
+  {
+    variance_1 = lamda*variance_0 + (1-lamda)*(r_vec[i]^2)
+    variance[i] = variance_1
+    
+    var[i] = -1*variance_1*qnorm(1-a,0,1)
+    
+    variance_0 = variance_1
+    i = i + 1
+  }
 }
 
 # general histogram function
@@ -66,29 +95,36 @@ vec_hist <- function(x, names)
   lines(xfit, yfit, col="blue", lwd=2)
 }
 
-#---------------------start of code---------------------#
+#---------------------calculations---------------------#
 
 invest = 1000000 # investment per firm
 file1 = "returns_main"
 file2 = "returns_comp"
+file3 = "returns_main_hist"
+file4 = "returns_comp_hist"
 
 #reads files, gets list of returns and value
 data_m = read_func(file1,invest)
 data_c = read_func(file2,invest)
+data_mh = read_func(file3,invest)
+data_ch = read_func(file4,invest)
 
 #confidence interval for var
 conf = 0.95
 
 # pulls var calculations
 var_m = var_calc(data_m,conf)
-var_c = var_calc(data_C,conf)
+var_c = var_calc(data_c,conf)
+
+#---------------------graphing---------------------#
 
 # lists with labels for histograms
 chart_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns")
 chart_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
-                       "xlabel" = "Daily Returns")
+                       "xlabel" = "Daily Returns") 
 
 # write histograms for historical returns
 vec_hist(data_m$returns, chart_returns_m)
 vec_hist(data_c$returns, chart_returns_c)
+
