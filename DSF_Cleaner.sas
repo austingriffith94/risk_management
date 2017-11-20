@@ -13,16 +13,22 @@ libname comp "&Cpath";
 libname crsp "&Dpath";
 libname risk "&Ppath";
 
-/*--------------------------DSF for random year spread--------------------------*/
+/*--------------------------DSF--------------------------*/
 /*data is on a daily basis*/
 /*pulls data from dsf file*/
-data dsf;
+data dsf_comp;
 set crsp.dsf (keep = PERMNO DATE RET);
 YEAR = year(DATE);
 format DATE mmddyy10.;
-if YEAR >= 2005 and YEAR <= 2010;
+if YEAR >= 2000 and YEAR <= 2010;
 if missing(PERMNO) then delete;
 if nmiss(RET) then delete;
+run;
+
+/*data for random time period*/
+data dsf;
+set dsf_comp;
+if YEAR >= 2005 or YEAR <= 2010;
 run;
 
 /*creates new set of data*/
@@ -59,16 +65,6 @@ if a & b;
 run;
 
 /*--------------------------DSF 2000 to 2010--------------------------*/
-/*for comparison time period*/
-data dsf_comp;
-set crsp.dsf (keep = PERMNO DATE RET);
-YEAR = year(DATE);
-format DATE mmddyy10.;
-if YEAR >= 2000 and YEAR <= 2010;
-if missing(PERMNO) then delete;
-if nmiss(RET) then delete;
-run;
-
 /*sorts main dsf data by firm for merge*/
 proc sort data = dsf_comp;
 by PERMNO;
