@@ -41,8 +41,9 @@ read_func <- function(value, I)
 }
 
 #function to calculate var
-var_calc <- function(r_vec,port,a)
+var_calc <- function(returns,port,a)
 {
+  r_vec = returns[["RET"]]
   vol = sd(r_vec)
   avg_ret = mean(r_vec)
   
