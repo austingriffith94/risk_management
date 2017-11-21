@@ -58,9 +58,10 @@ var_calc <- function(returns,port,a)
 }
 
 # one day var calculations
-var_oneday <- function(r_vec,port,hist,a)
+var_oneday <- function(returns,port,hist_returns,a)
 {
   #initial variance using historical data
+  hist = hist_returns[["RET"]]
   variance_0 = var(hist)
   
   #variables for while loop
@@ -68,9 +69,9 @@ var_oneday <- function(r_vec,port,hist,a)
   i = 1
   variance = c(0)
   var = c(0)
-  while(i <= length(r_vec))
+  while(i <= nrows(returns))
   {
-    variance_1 = lamda*variance_0 + (1-lamda)*(r_vec[i]^2)
+    variance_1 = lamda*variance_0 + (1-lamda)*(returns[i,"RET"]^2)
     variance[i] = variance_1
     
     var[i] = -1*sqrt(variance_1)*qnorm(1-a,0,1)
@@ -78,8 +79,10 @@ var_oneday <- function(r_vec,port,hist,a)
     variance_0 = variance_1
     i = i + 1
   }
-  data = list("variance" = variance, "oneday" = var)
-  return(data)
+  
+  returns$variance = variance
+  returns$VaR = var
+  return(returns)
 }
 
 # general histogram function
