@@ -45,27 +45,25 @@ var_calc <- function(returns,port,a)
 {
   r_vec = returns[["RET"]]
   vol = sd(r_vec)
-  avg_ret = mean(r_vec)
   cumdist = qnorm(1-a,0,1)
   
   var = abs(quantile(r_vec,1-a))
-  dol_var = port*(1-exp(-var))
-  par_var = abs(cumdist*vol*port)
-  hist_var = abs(quantile(r_vec,1-a)*port)
+  dol_var = abs(quantile(r_vec,1-a)*port)
   
   exp_short = vol*dnorm(cumdist)/(1-a)
 
-  data = list("VaR"=var, "$VaR"=dol_var, "Parametric"=par_var, 
-              "Historical"=hist_var, "ExpShort" = exp_short)
+  data = list("VaR"=var, "$VaR"=dol_var, 
+              "ExpShort" = exp_short)
   return(data)
 }
 
-# one day var calculations
+# risk metrics one day modeling
 var_oneday <- function(returns,port,hist_returns,a)
 {
-  #initial variance using historical data
+  # initial variance using historical data
+  # variance based off of previous 10 days
   hist = hist_returns[["RET"]]
-  variance_0 = var(hist)
+  variance_0 = var(hist[length(hist)-10:length(hist)])
   
   #variables for while loop
   lamda = 0.94
@@ -93,8 +91,8 @@ var_oneday <- function(returns,port,hist_returns,a)
   return(returns)
 }
 
-# general histogram function
-vec_hist <- function(x, names)
+# histogram function with normal dist overlay
+vec_histogram <- function(x, names)
 {
   h = hist(x, breaks=(length(x)/50), col="red", xlab=names$xlabel, 
           main=names$title) 
@@ -112,22 +110,22 @@ file2 = "returns_comp"
 file3 = "returns_main_hist"
 file4 = "returns_comp_hist"
 
-#reads files, gets list of returns and value
+# reads files, gets list of returns and value
 data_m = read_func(file1,invest)
 data_c = read_func(file2,invest)
 data_mh = read_func(file3,invest)
 data_ch = read_func(file4,invest)
 
-#confidence interval for var
+# confidence interval for var
 conf = 0.95
 
 # pulls var calculations
 var_m = var_calc(data_m$returns,data_m$portfolio,conf)
 var_c = var_calc(data_c$returns,data_c$portfolio,conf)
 
-main = var_oneday(data_m$returns,data_m$portfolio,
+oneday_m = var_oneday(data_m$returns,data_m$portfolio,
                   data_mh$returns,conf)
-comp = var_oneday(data_c$returns,data_c$portfolio,
+oneday_c = var_oneday(data_c$returns,data_c$portfolio,
                   data_ch$returns,conf)
 
 #---------------------graphing---------------------#
@@ -139,10 +137,21 @@ hist_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns") 
 
 # write histograms for historical returns
-vec_hist(data_m$returns[["RET"]], hist_returns_m)
-vec_hist(data_c$returns[["RET"]], hist_returns_c)
+vec_histogram(data_m$returns[["RET"]], hist_returns_m)
+vec_histogram(data_c$returns[["RET"]], hist_returns_c)
+
+plot.ts(oneday_m[["variance"]])
 
 
-y = main$VaR
-plot(y)
+ret = data_m$returns
+ret$year = substr(ret$DATE,7,10)
+
+
+
+# garch model
+library(fGarch)
+x.g = garchFit(~garch(1,1),data_m$returns)
+summary(x.g)
+coef(x.g)
+
 
