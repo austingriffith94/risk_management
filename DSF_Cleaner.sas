@@ -16,11 +16,11 @@ libname risk "&Ppath";
 /*--------------------------DSF--------------------------*/
 /*data is on a daily basis*/
 /*pulls data from dsf file*/
-data dsf_comp;
+data dsf_input;
 set crsp.dsf (keep = PERMNO DATE RET);
 YEAR = year(DATE);
 format DATE mmddyy10.;
-if YEAR >= 2000 and YEAR <= 2010;
+if YEAR >= 1999 and YEAR <= 2010;
 if missing(PERMNO) then delete;
 if nmiss(RET) then delete;
 run;
@@ -28,7 +28,7 @@ run;
 /*data for random time period*/
 data dsf;
 set dsf_comp;
-if YEAR >= 2005 or YEAR <= 2010;
+if YEAR < 2005 then delete;
 run;
 
 /*creates new set of data*/
@@ -66,15 +66,34 @@ run;
 
 /*--------------------------DSF 2000 to 2010--------------------------*/
 /*sorts main dsf data by firm for merge*/
-proc sort data = dsf_comp;
+proc sort data = dsf_input;
 by PERMNO;
 run;
 
 /*merges data, keeps 100 random firms*/
-data risk_comp;
-merge dsf_comp(in = a) dsf_100(in = b);
+data dsf_comp;
+merge dsf_input(in = a) dsf_100(in = b);
 by PERMNO;
 if a & b;
+run;
+
+/*gets desired year for comparison sample*/
+data risk_comp;
+set dsf_comp;
+if YEAR < 2000 then delete;
+run;
+
+/*--------------------------Historical--------------------------*/
+/*gets historical return data year prior to sample 2005-2010*/
+data main_hist;
+set dsf_comp;
+if YEAR = 2004;
+run;
+
+/*gets historical return data year prior to sample 2000-2010*/
+data comp_hist;
+set dsf_comp;
+if YEAR = 1999;
 run;
 
 /*--------------------------Export--------------------------*/
@@ -88,5 +107,17 @@ run;
 proc export data = risk_comp
 dbms = csv
 outfile= "&Ppath\returns_comp.csv"
+replace;
+run;
+
+proc export data = main_hist
+dbms = csv
+outfile= "&Ppath\returns_main_hist.csv"
+replace;
+run;
+
+proc export data = comp_hist
+dbms = csv
+outfile= "&Ppath\returns_comp_hist.csv"
 replace;
 run;
