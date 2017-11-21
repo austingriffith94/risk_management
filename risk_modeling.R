@@ -15,8 +15,6 @@ getwd()
 # assumed equal investment weight in each firm
 read_func <- function(value, I)
 {
-  value = "returns_main"
-  I = 1000000
   filename = paste(value, ".csv", sep="")
   ret = read.csv(filename, header=TRUE)
   
@@ -28,19 +26,17 @@ read_func <- function(value, I)
   ret_sum = ret_sum[order(as.Date(ret_sum$DATE, "%m/%d/%Y"), decreasing=FALSE),] 
   ret_date = unique(ret_sum[["DATE"]])
   
-  keeps = c("RET")
-  ret_sum = subset(ret_sum, select = keeps)
-  ret_vec = ret_sum[["RET"]]
+  keeps = c("RET","DATE")
+  ret_sum = ret_sum[keeps]
   
   i = 1
-  while(i < length(ret_vec))
+  while(i < nrow(ret_sum))
   {
-    ret_vec[i] = ret_vec[i]/count
+    ret_sum[i,"RET"] = ret_sum[i,"RET"]/count
     i = i + 1
   }
   
-  data = list("portfolio" = port, "returns" = ret_vec,
-              "dates" = ret_date)
+  data = list("portfolio" = port, "returns" = ret_sum)
   return(data)
 }
 
