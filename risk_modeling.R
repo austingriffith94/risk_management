@@ -69,9 +69,9 @@ var_oneday <- function(returns,port,hist_returns,a)
   i = 1
   variance = c(0)
   var = c(0)
-  while(i <= nrows(returns))
+  while(i <= nrow(returns))
   {
-    variance_1 = lamda*variance_0 + (1-lamda)*(returns[i,"RET"]^2)
+    variance_1 = lamda*variance_0 + (1-lamda)*((returns[i,"RET"])^2)
     variance[i] = variance_1
     
     var[i] = -1*sqrt(variance_1)*qnorm(1-a,0,1)
@@ -117,9 +117,9 @@ conf = 0.95
 var_m = var_calc(data_m$returns,data_m$portfolio,conf)
 var_c = var_calc(data_c$returns,data_c$portfolio,conf)
 
-main = var_oneday(data_m$returns,date_m$portfolio,
+main = var_oneday(data_m$returns,data_m$portfolio,
                   data_mh$returns,conf)
-comp = var_oneday(data_c$returns,date_c$portfolio,
+comp = var_oneday(data_c$returns,data_c$portfolio,
                   data_ch$returns,conf)
 
 #---------------------graphing---------------------#
@@ -131,11 +131,10 @@ hist_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns") 
 
 # write histograms for historical returns
-vec_hist(data_m$returns, hist_returns_m)
-vec_hist(data_c$returns, hist_returns_c)
+vec_hist(data_m$returns[["RET"]], hist_returns_m)
+vec_hist(data_c$returns[["RET"]], hist_returns_c)
 
 
-y = main$oneday
-x = data_m$dates
-plot(x,y)
+y = main$VaR
+plot(y)
 
