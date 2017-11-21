@@ -15,6 +15,8 @@ getwd()
 # assumed equal investment weight in each firm
 read_func <- function(value, I)
 {
+  value = "returns_main"
+  I = 1000000
   filename = paste(value, ".csv", sep="")
   ret = read.csv(filename, header=TRUE)
   
@@ -23,6 +25,9 @@ read_func <- function(value, I)
   port = count*I
    
   ret_sum = aggregate(.~DATE, data=ret, FUN=sum)
+  ret_sum = ret_sum[order(as.Date(ret_sum$DATE, "%m/%d/%Y"), decreasing=FALSE),] 
+  ret_date = unique(ret_sum[["DATE"]])
+  
   keeps = c("RET")
   ret_sum = subset(ret_sum, select = keeps)
   ret_vec = ret_sum[["RET"]]
@@ -34,16 +39,14 @@ read_func <- function(value, I)
     i = i + 1
   }
   
-  data = list("port_val" = port, "returns" = ret_vec)
+  data = list("portfolio" = port, "returns" = ret_vec,
+              "dates" = ret_date)
   return(data)
 }
 
 #function to calculate var
-var_calc <- function(lists,a)
+var_calc <- function(r_vec,port,a)
 {
-  r_vec = lists$returns
-  port = lists$port_val
-  
   vol = sd(r_vec)
   avg_ret = mean(r_vec)
   
@@ -58,12 +61,8 @@ var_calc <- function(lists,a)
 }
 
 # one day var calculations
-var_oneday <- function(lists,hd,a)
+var_oneday <- function(r_vec,port,hist,a)
 {
-  r_vec = lists$returns
-  port = lists$port_val
-  hist = hd$returns
-  
   #initial variance using historical data
   variance_0 = var(hist)
   
@@ -72,17 +71,17 @@ var_oneday <- function(lists,hd,a)
   i = 1
   variance = c(0)
   var = c(0)
-  while(i < length(r_vec))
+  while(i <= length(r_vec))
   {
     variance_1 = lamda*variance_0 + (1-lamda)*(r_vec[i]^2)
     variance[i] = variance_1
     
-    var[i] = -1*variance_1*qnorm(1-a,0,1)
+    var[i] = -1*sqrt(variance_1)*qnorm(1-a,0,1)
     
     variance_0 = variance_1
     i = i + 1
   }
-  data = list("variance" = variance, "one day var" = var)
+  data = list("variance" = variance, "oneday" = var)
   return(data)
 }
 
@@ -115,21 +114,28 @@ data_ch = read_func(file4,invest)
 conf = 0.95
 
 # pulls var calculations
-var_m = var_calc(data_m,conf)
-var_c = var_calc(data_c,conf)
+var_m = var_calc(data_m$returns,data_m$portfolio,conf)
+var_c = var_calc(data_c$returns,data_c$portfolio,conf)
 
-main = var_oneday(data_m,data_mh,conf)
-comp = var_oneday(data_m,data_mh,conf)
+main = var_oneday(data_m$returns,date_m$portfolio,
+                  data_mh$returns,conf)
+comp = var_oneday(data_c$returns,date_c$portfolio,
+                  data_ch$returns,conf)
 
 #---------------------graphing---------------------#
 
 # lists with labels for histograms
-chart_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
+hist_returns_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns")
-chart_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
+hist_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns") 
 
 # write histograms for historical returns
-vec_hist(data_m$returns, chart_returns_m)
-vec_hist(data_c$returns, chart_returns_c)
+vec_hist(data_m$returns, hist_returns_m)
+vec_hist(data_c$returns, hist_returns_c)
+
+
+y = main$oneday
+x = data_m$dates
+plot(x,y)
 
