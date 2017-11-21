@@ -46,14 +46,17 @@ var_calc <- function(returns,port,a)
   r_vec = returns[["RET"]]
   vol = sd(r_vec)
   avg_ret = mean(r_vec)
+  cumdist = qnorm(1-a,0,1)
   
   var = abs(quantile(r_vec,1-a))
   dol_var = port*(1-exp(-var))
-  par_var = abs(qnorm(1-a,0,1)*vol*port)
+  par_var = abs(cumdist*vol*port)
   hist_var = abs(quantile(r_vec,1-a)*port)
+  
+  exp_short = vol*dnorm(cumdist)/(1-a)
 
   data = list("VaR"=var, "$VaR"=dol_var, "Parametric"=par_var, 
-              "Historical"=hist_var)
+              "Historical"=hist_var, "ExpShort" = exp_short)
   return(data)
 }
 
@@ -69,12 +72,16 @@ var_oneday <- function(returns,port,hist_returns,a)
   i = 1
   variance = c(0)
   var = c(0)
+  exp_short= c(0)
+  cumdist = qnorm(1-a,0,1)
+  
   while(i <= nrow(returns))
   {
     variance_1 = lamda*variance_0 + (1-lamda)*((returns[i,"RET"])^2)
     variance[i] = variance_1
     
-    var[i] = -1*sqrt(variance_1)*qnorm(1-a,0,1)
+    var[i] = -1*sqrt(variance_1)*cumdist
+    exp_short[i] = sqrt(variance_1)*dnorm(cumdist)/(1-a)
     
     variance_0 = variance_1
     i = i + 1
@@ -82,6 +89,7 @@ var_oneday <- function(returns,port,hist_returns,a)
   
   returns$variance = variance
   returns$VaR = var
+  returns$ExpShort = exp_short
   return(returns)
 }
 
