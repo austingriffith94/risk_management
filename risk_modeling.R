@@ -143,15 +143,11 @@ vec_histogram(data_c$returns[["RET"]], hist_returns_c)
 plot.ts(oneday_m[["variance"]])
 
 
-ret = data_m$returns
-ret$year = substr(ret$DATE,7,10)
-
-
-
 # garch model
+mergeset = oneday_m
 library(fGarch)
-x.g = garchFit(~garch(1,1),data_m$returns)
+x.g = garchFit(~garch(1,1),mergeset[["RET"]])
 summary(x.g)
 coef(x.g)
-
-
+mergeset$new_variance = coef(x.g)[1]+coef(x.g)[3]*(mergeset$RET^2)+coef(x.g)[4]*mergeset$variance
+plot.ts(mergeset$new_variance)
