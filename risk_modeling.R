@@ -49,11 +49,10 @@ var_calc <- function(returns,port,a)
   
   var = abs(quantile(r_vec,1-a))
   dol_var = abs(quantile(r_vec,1-a)*port)
-  
   exp_short = vol*dnorm(cumdist)/(1-a)
 
   data = list("VaR"=var, "$VaR"=dol_var, 
-              "ExpShort" = exp_short)
+              "Expected_Shortfall" = exp_short)
   return(data)
 }
 
@@ -65,7 +64,7 @@ var_oneday <- function(returns,port,hist_returns,a)
   hist = hist_returns[["RET"]]
   variance_0 = var(hist[length(hist)-10:length(hist)])
   
-  #variables for while loop
+  # variables for while loop
   lamda = 0.94
   i = 1
   variance = c(0)
@@ -88,6 +87,17 @@ var_oneday <- function(returns,port,hist_returns,a)
   returns$variance = variance
   returns$VaR = var
   returns$ExpShort = exp_short
+  return(returns)
+}
+
+# garch model
+garch_f <- function(returns)
+{
+  library(fGarch)
+  x.g = garchFit(~garch(1,1),returns[["RET"]])
+  summary(x.g)
+  coef(x.g)
+  returns$new_variance = coef(x.g)[1]+coef(x.g)[3]*(returns$RET^2)+coef(x.g)[4]*returns$variance
   return(returns)
 }
 
@@ -140,14 +150,18 @@ hist_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
 vec_histogram(data_m$returns[["RET"]], hist_returns_m)
 vec_histogram(data_c$returns[["RET"]], hist_returns_c)
 
-plot.ts(oneday_m[["variance"]])
+# garch code
 
+oneday_m = garch_f(oneday_m)
+oneday_c = garch_f(oneday_c)
 
-# garch model
-mergeset = oneday_m
-library(fGarch)
-x.g = garchFit(~garch(1,1),mergeset[["RET"]])
-summary(x.g)
-coef(x.g)
-mergeset$new_variance = coef(x.g)[1]+coef(x.g)[3]*(mergeset$RET^2)+coef(x.g)[4]*mergeset$variance
-plot.ts(mergeset$new_variance)
+time = c(1:nrow(oneday_m))
+time = time/252 + 2005
+plot(time,oneday_m$new_variance)
+plot(time,oneday_m$variance)
+
+time = c(1:nrow(oneday_c))
+time = time/252 + 2000
+plot(time,oneday_c$new_variance)
+plot(time,oneday_c$variance)
+
