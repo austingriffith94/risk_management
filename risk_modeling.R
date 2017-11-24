@@ -57,7 +57,7 @@ var_calc <- function(returns,port,a)
 }
 
 # risk metrics one day modeling
-var_oneday <- function(returns,port,hist_returns,a)
+oneday_f <- function(returns,port,hist_returns,a)
 {
   # initial variance using historical data
   # variance based off of previous 10 days
@@ -76,28 +76,48 @@ var_oneday <- function(returns,port,hist_returns,a)
   {
     variance_1 = lamda*variance_0 + (1-lamda)*((returns[i,"RET"])^2)
     variance[i] = variance_1
-    
     var[i] = -1*sqrt(variance_1)*cumdist
     exp_short[i] = sqrt(variance_1)*dnorm(cumdist)/(1-a)
     
     variance_0 = variance_1
     i = i + 1
   }
-  
-  returns$variance = variance
+  returns$m_variance = variance
   returns$VaR = var
   returns$ExpShort = exp_short
   return(returns)
 }
 
 # garch model
-garch_f <- function(returns)
+garch_f <- function(returns,hist_returns)
 {
+  # initial variance using historical data
+  # variance based off of previous 10 days
+  hist = hist_returns[["RET"]]
+  variance_0 = var(hist[length(hist)-10:length(hist)])
+  
+  # function to solve for garch model variables
   library(fGarch)
   x.g = garchFit(~garch(1,1),returns[["RET"]])
   summary(x.g)
   coef(x.g)
-  returns$new_variance = coef(x.g)[1]+coef(x.g)[3]*(returns$RET^2)+coef(x.g)[4]*returns$variance
+  
+  # variables for loop and garch model
+  i = 1
+  variance = c(0)
+  alpha = coef(x.g)[4]
+  beta = coef(x.g)[3]
+  omega = coef(x.g)[1]
+  
+  while(i <= nrow(returns))
+  {
+    variance_1 = omega + beta*variance_0 + alpha*((returns[i,"RET"])^2)
+    variance[i] = variance_1
+    
+    variance_0 = variance_1
+    i = i + 1
+  }
+  returns$g_variance = variance
   return(returns)
 }
 
@@ -133,10 +153,12 @@ conf = 0.95
 var_m = var_calc(data_m$returns,data_m$portfolio,conf)
 var_c = var_calc(data_c$returns,data_c$portfolio,conf)
 
-oneday_m = var_oneday(data_m$returns,data_m$portfolio,
+oneday_m = oneday_f(data_m$returns,data_m$portfolio,
                   data_mh$returns,conf)
-oneday_c = var_oneday(data_c$returns,data_c$portfolio,
+oneday_c = oneday_f(data_c$returns,data_c$portfolio,
                   data_ch$returns,conf)
+garch_m = garch_f(data_m$returns,data_mh$returns)
+garch_c = garch_f(data_c$returns,data_ch$returns)
 
 #---------------------graphing---------------------#
 
