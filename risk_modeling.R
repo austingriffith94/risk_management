@@ -29,6 +29,7 @@ read_func <- function(value, I)
   keeps = c("RET","DATE")
   ret_sum = ret_sum[keeps]
   
+  # gets average
   i = 1
   while(i < nrow(ret_sum))
   {
@@ -105,9 +106,9 @@ garch_f <- function(returns,hist_returns)
   # variables for loop and garch model
   i = 1
   variance = c(0)
-  alpha = coef(x.g)[4]
-  beta = coef(x.g)[3]
-  omega = coef(x.g)[1]
+  alpha = coef(x.g)[3]
+  beta = coef(x.g)[4]
+  omega = coef(x.g)[2]
   
   while(i <= nrow(returns))
   {
@@ -172,18 +173,14 @@ hist_returns_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
 vec_histogram(data_m$returns[["RET"]], hist_returns_m)
 vec_histogram(data_c$returns[["RET"]], hist_returns_c)
 
-# garch code
-
-oneday_m = garch_f(oneday_m)
-oneday_c = garch_f(oneday_c)
-
+# graph variance
 time = c(1:nrow(oneday_m))
 time = time/252 + 2005
-plot(time,oneday_m$new_variance)
-plot(time,oneday_m$variance)
+plot(time,garch_m$g_variance)
+plot(time,oneday_m$m_variance)
 
 time = c(1:nrow(oneday_c))
 time = time/252 + 2000
-plot(time,oneday_c$new_variance)
-plot(time,oneday_c$variance)
+plot(time,garch_c$g_variance)
+plot(time,oneday_c$m_variance)
 
