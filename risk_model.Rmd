@@ -1,7 +1,7 @@
 ---
 title: "Risk Model"
 author: "Austin Griffith"
-date: "November 21, 2017"
+date: "November 25, 2017"
 output:
   html_document:
     df_print: paged
@@ -200,7 +200,7 @@ oneday_m = oneday_f(data_m$returns,data_mh$returns,conf)
 oneday_c = oneday_f(data_c$returns,data_ch$returns,conf)
 ```
 
-The second function uses the GARCH model. The function is structurally similar in its estimation of the future variance, but adds a drift constant. The function also uses a GARCH library command to solve for the omega, alpha and beta constants. It also outputs the model statistics and coefficient values.
+The second function uses the GARCH model. The function is structurally similar in its estimation of the future variance, but adds a drift constant. The function also uses a GARCH library command to solve for the omega, alpha and beta constants. The command uses a distribution of returns to solve for the coefficient values used in the GARCH variance estimation. It also outputs the model statistics and coefficient values.
 
 The function also uses a historical data set to determine the initial variance of the model. There is a similar loop structure to iterate through returns and determine the variance of the GARCH model.
 
@@ -312,6 +312,8 @@ The RiskMetrics model shows a smaller VaR during stable periods, but jumps up to
 
 #### 2000-2010 Data Period Variance
 
+The same code is used for the plotting of the comparison period. This is functionally identical to the previously listed code, with the only differences being the data frame being formed from the comparison period risk calculations.
+
 ```{r comp_plotting}
 # graph variance, VaR for comparison data
 time = c(1:nrow(garch_c))
@@ -332,7 +334,11 @@ plot_ly(data, x = ~time, y = ~variance, name = "Garch Model",
          yaxis = list(title = "Variance"))
 ```
 
+The comparison period captures half a decade before the main period. You can see the increased volatility a the turn of the century, likely due to excessive speculation in the emerging tech industry and the 9/11 attacks. The GARCH and RiskMetrics models follow similar trends as previously stated above. 
+
 #### 2000-2010 Data Period VaR
+
+The VaR is plotted in a identical fashion to the previus VaR. 
 
 ```{r comp_plotting2}
 plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch", 
@@ -344,4 +350,9 @@ plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch",
          xaxis = list(title = "Year"),
          yaxis = list(title = "VaR"))
 ```
+
+For the comparison period VaR, the VaR again appears to be magnified by the trends of the market volatility. The shifts in VaR values appear to be more sensitive to changes than volatility. For the majority of the early 2000's, there is rarely ever more than 2% at risk. Outside of the early 2000's panics, the VaR consistently fluctuates about 1%. Similar to the main period, the 2008 financial crisis leads to 5% of the portfolio being at risk during the moments of highest volatility.
+
+The comparison between the two periods shows that both risk models correct themselves over time. The initial estimate is relatively neglible once a few days pass, and the model reaches a predictable path. For each model, the financial crisis trends nearly identically with one another, even though one model starts half a decade earlier.
+
 
