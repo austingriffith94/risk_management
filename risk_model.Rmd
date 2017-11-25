@@ -108,6 +108,10 @@ vec_histogram(data_m$returns[["RET"]], hist_label_m)
 vec_histogram(data_c$returns[["RET"]], hist_label_c)
 ```
 
+The returns distributions show how the firms performed for each of the periods. The main takeaway from each of the periods is that there is no return or loss above 5% for either period. Since the periods overlap in this case, it implies that the largest losses and returns likely occur somewhere between the start of 2005 and the end of 2010.
+
+Specific to these firms, the mean is likely set above 0. The main insight to take away from the distribution is that the VaR and expected shortfall should be expected to be smaller than 5% for both periods.
+
 ### VaR, $VaR and Expected Shortfall
 
 VaR was the first of the calculations used to determine the risk of the randomly chosen firms. The $VaR was calculated simultaneously in the same function. Both of these risk metrics require a confidence interval with which to measure the downside risk. For this particular case, 95% confidence was chosen.
