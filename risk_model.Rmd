@@ -8,6 +8,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+# the initialization of the code
+# installs needed packages and sets working directory
 knitr::opts_chunk$set(echo = TRUE)
 setwd("C:/Users/Austin/GIT_profile/risk_management")
 getwd()
@@ -155,7 +157,7 @@ Both of the functions below capture the day by day swing of the variance, VaR an
 
 The first function is the calculation of the RiskMetrics model (also known as the "exponential smoother"). This solves for the variance of the next day using todays variance and returns. The coefficient of the model is assumed to be 0.94 by the RiskMetrics model.
 
-The function uses the initial variance estimate as the variance across all assets for the previous ten days. In order to find the previous ten days, a historical data set was imported (shown in code above).
+The function uses the initial variance estimate as the variance across all assets for the previous ten days. In order to find the previous ten days, a historical data set was imported (shown in code above). A loop is used to iterate through the return values for the time period to determine variance values for the RiskMetrics model.
 
 ```{r oneday}
 # risk metrics one day modeling
@@ -194,11 +196,11 @@ oneday_m = oneday_f(data_m$returns,data_mh$returns,conf)
 oneday_c = oneday_f(data_c$returns,data_ch$returns,conf)
 ```
 
-The second function uses the GARCH model. The function is structurally similar in its estimation of the future variance, but adds a drift constant. The function also uses a GARCH library command to solve for the omega, alpha and beta constants. It also outputs the summary statistics and coefficient values.
+The second function uses the GARCH model. The function is structurally similar in its estimation of the future variance, but adds a drift constant. The function also uses a GARCH library command to solve for the omega, alpha and beta constants. It also outputs the model statistics and coefficient values.
 
-The function also uses a historical data set to determine the initial variance of the model.
+The function also uses a historical data set to determine the initial variance of the model. There is a similar loop structure to iterate through returns and determine the variance of the GARCH model.
 
-```{r garch}
+```{r garch_function}
 # garch model
 garch_f <- function(returns,hist_returns,a)
 {
@@ -237,12 +239,25 @@ garch_f <- function(returns,hist_returns,a)
   returns$variance = variance
   return(returns)
 }
+```
 
+The following two commands run the above listed function. The output is the model statistics from the GARCH package solver, and the coefficients of alpha, beta, and omega.
+
+```{r garch}
 garch_m = garch_f(data_m$returns,data_mh$returns,conf)
 garch_c = garch_f(data_c$returns,data_ch$returns,conf)
 ```
 
+
 ### Plotting of Daily Data
+The comparison plots for daily values created from the two different risk models are determined below. Each set of data has two plots: 
+- Variance - a plot of variance over time
+- VaR - a plot of VaR over time
+
+#### 2005-2010 Data Period Variance
+The code below is used to create an x axis value for the time series of the plot. This was created by taking the number of observations of returns in the data and dividing the value by 252 (number of trading days in the year). The next commands read the earliest date value. It takes a substring of the year, and transfers it to a numeric value. The year value is added to the observations as a percentage of the trading year. This creates the time value for the given set of data.
+
+This time, variance and VaR values are added into a single data frame. From here, the values can be plotting using the R package plotly. These plots allow for much more interactive and versatile linear plots than the standard R plots. However, upon using in this .Rmd file, it was found out that it isn't compatable with .pdf writing. Therefore, the output format was changed to .hmtl.
 
 ```{r main_plotting}
 # graph variance, VaR for main data
@@ -262,7 +277,21 @@ add_trace(y = ~rm_variance, name = "RiskMetrics Model",
 layout(title = "Main Data Daily Variance",
        xaxis = list(title = "Year"),
        yaxis = list(title = "Variance"))
+```
 
+The variance of the 100 firms from 2005 to 2010 shows general trends of market volatility. The variance had mild spikes in between 2006 and 2007, but remained relatively stable for the early years of the period. Throughout this stable period, the GARCH model showed more variance than RiskMetrics.
+
+After the second quarter of 2007, the variance had a bump to nearly twice its stable value. This was shortly followed by a sharp spike, representing the 2008 financial crisis. During the greater instability, the RiskMetrics model showed greater variance.
+
+You can also see another spike in mid 2010, indicative of the 100 firms likely being affected by the flash crash in May.
+
+From the comparison, it can be inferred that the RiskMetrics model is more reactive to the market returns. This can likely be attributed to the GARCH model having a smaller coefficient for the squared returns, as well as a constant addition. These both contribute to the GARCH model having a more conservative model of variance that doesn't have as large an estimate during volatile times.
+
+#### 2005-2010 Data Period VaR
+
+For the VaR, not much in the plotting code was changed. It still calls the same functions and uses the same time series for the x axis. The code calls the same layout of comparative values. 
+
+```{r main_plotting2}
 plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch", 
         type = "scatter", mode = "lines", 
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
@@ -272,6 +301,12 @@ layout(title = "Main Data Daily VaR",
        xaxis = list(title = "Year"),
        yaxis = list(title = "VaR"))
 ```
+
+The daily VaR has similar trends to the the previously plotted variance. The time of instability are now greater. The VaR captures the small periods of increased variance, and spikes to reflect the greater potential losses.
+
+The RiskMetrics model shows a smaller VaR during stable periods, but jumps up to the GARCH model estimation shortly after sharp spikes. During the periods of greatest instability, RiskMetrics shows a greater VaR than GARCH. GARCH appears to be less prone to VaR swings as RiskMetrics, but has a higher resting VaR during more stable periods. This is the same relationship between the two models as shown in the variance models.
+
+#### 2000-2010 Data Period Variance
 
 ```{r comp_plotting}
 # graph variance, VaR for comparison data
@@ -291,7 +326,11 @@ plot_ly(data, x = ~time, y = ~variance, name = "Garch Model",
   layout(title = "Comparison Data Daily Variance",
          xaxis = list(title = "Year"),
          yaxis = list(title = "Variance"))
+```
 
+#### 2000-2010 Data Period VaR
+
+```{r comp_plotting2}
 plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch", 
         type = "scatter", mode = "lines", 
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
