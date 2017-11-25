@@ -2,7 +2,9 @@
 title: "Risk Model"
 author: "Austin Griffith"
 date: "November 21, 2017"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -157,7 +159,7 @@ The function uses the initial variance estimate as the variance across all asset
 
 ```{r oneday}
 # risk metrics one day modeling
-oneday_f <- function(returns,port,hist_returns,a)
+oneday_f <- function(returns,hist_returns,a)
 {
   # initial variance using historical data
   # variance based off of previous 10 days
@@ -182,11 +184,14 @@ oneday_f <- function(returns,port,hist_returns,a)
     variance_0 = variance_1
     i = i + 1
   }
-  returns$m_variance = variance
+  returns$variance = variance
   returns$VaR = var
   returns$ExpShort = exp_short
   return(returns)
 }
+
+oneday_m = oneday_f(data_m$returns,data_mh$returns,conf)
+oneday_c = oneday_f(data_c$returns,data_ch$returns,conf)
 ```
 
 The second function uses the GARCH model. The function is structurally similar in its estimation of the future variance, but adds a drift constant. The function also uses a GARCH library command to solve for the omega, alpha and beta constants. It also outputs the summary statistics and coefficient values.
@@ -231,8 +236,17 @@ garch_f <- function(returns,hist_returns,a)
   }
   returns$VaR = var
   returns$ExpShort = exp_short
-  returns$g_variance = variance
+  returns$variance = variance
   return(returns)
 }
+
+garch_m = garch_f(data_m$returns,data_mh$returns,conf)
+garch_c = garch_f(data_c$returns,data_ch$returns,conf)
+```
+
+# Plotting of Daily Data
+
+```{r plotting}
+
 ```
 
