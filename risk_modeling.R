@@ -190,17 +190,13 @@ time = time/252 + year
 data = data.frame(garch_m,time)
 data$rm_variance = oneday_m$variance
 data$rm_VaR = oneday_m$VaR
-names = list("variance" = "Main Garch Model Variance",
-             "yaxis1" = "Variance of Returns",
-             "var" = "VaR from Garch Model",
-             "yaxis2" = "VaR")
 
 plot_ly(data, x = ~time, y = ~variance, name = "Garch Model", 
         type = "scatter", mode = "lines", 
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
 add_trace(y = ~rm_variance, name = "RiskMetrics Model", 
           line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
-layout(title = "Main Data Daily Variance Comparison",
+layout(title = "Main Data Daily Variance",
        xaxis = list(title = "Year"),
        yaxis = list(title = "Variance"))
 
@@ -209,7 +205,7 @@ plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch",
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
 add_trace(y = ~rm_VaR, name = "VaR from RiskMetrics", 
           line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
-layout(title = "Main Data Daily VaR Comparison",
+layout(title = "Main Data Daily VaR",
        xaxis = list(title = "Year"),
        yaxis = list(title = "VaR"))
 
@@ -221,17 +217,13 @@ time = time/252 + year
 data = data.frame(garch_c,time)
 data$rm_variance = oneday_c$variance
 data$rm_VaR = oneday_c$VaR
-names = list("variance" = "Main Garch Model Variance",
-             "yaxis1" = "Variance of Returns",
-             "var" = "VaR from Garch Model",
-             "yaxis2" = "VaR")
 
 plot_ly(data, x = ~time, y = ~variance, name = "Garch Model", 
         type = "scatter", mode = "lines", 
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
   add_trace(y = ~rm_variance, name = "RiskMetrics Model", 
             line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
-  layout(title = "Main Data Daily Variance Comparison",
+  layout(title = "Comparison Data Daily Variance",
          xaxis = list(title = "Year"),
          yaxis = list(title = "Variance"))
 
@@ -240,7 +232,7 @@ plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch",
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
   add_trace(y = ~rm_VaR, name = "VaR from RiskMetrics", 
             line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
-  layout(title = "Main Data Daily VaR Comparison",
+  layout(title = "Comparison Data Daily VaR",
          xaxis = list(title = "Year"),
          yaxis = list(title = "VaR"))
 
