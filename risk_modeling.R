@@ -86,7 +86,7 @@ oneday_f <- function(returns,hist_returns,a)
     variance_0 = variance_1
     i = i + 1
   }
-  returns$rm_variance = variance
+  returns$variance = variance
   returns$VaR = var
   returns$ExpShort = exp_short
   return(returns)
@@ -127,12 +127,12 @@ garch_f <- function(returns,hist_returns,a)
   }
   returns$VaR = var
   returns$ExpShort = exp_short
-  returns$g_variance = variance
+  returns$variance = variance
   return(returns)
 }
 
 # histogram function with normal dist overlay
-vec_histogram <- function(x, names)
+vec_histogram <- function(x,names)
 {
   h = hist(x, breaks=(length(x)/50), col="red", xlab=names$xlabel, 
           main=names$title) 
@@ -173,30 +173,75 @@ garch_c = garch_f(data_c$returns,data_ch$returns,conf)
 #---------------------graphing---------------------#
 
 # lists with labels for histograms
-hist_label_m = list("title" = "2005 to 2010 Returns w/ Normal Curve",
+hist_label_m = list("title" = "Main Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns")
-hist_label_c = list("title" = "2000 to 2010 Returns w/ Normal Curve",
+hist_label_c = list("title" = "Comparison Returns w/ Normal Curve",
                        "xlabel" = "Daily Returns") 
 
 # write histograms for historical returns
 vec_histogram(data_m$returns[["RET"]], hist_label_m)
 vec_histogram(data_c$returns[["RET"]], hist_label_c)
 
-# graph variance, VaR and ES
-time = c(1:nrow(oneday_m))
-time = time/252 + 2005
+# graph variance, VaR for main data
+time = c(1:nrow(garch_m))
+year = substr(garch_m[1,"DATE"],7,10)
+year = as.numeric(year)
+time = time/252 + year
 data = data.frame(garch_m,time)
-data$y = data$g_variance
-names = list("main" = "Garch Model Variance Main",
-             "yaxis" = "Variance of Returns")
+data$rm_variance = oneday_m$variance
+data$rm_VaR = oneday_m$VaR
+names = list("variance" = "Main Garch Model Variance",
+             "yaxis1" = "Variance of Returns",
+             "var" = "VaR from Garch Model",
+             "yaxis2" = "VaR")
 
-plot_ly(data, x = ~time, y = ~y, name = names$main, 
+plot_ly(data, x = ~time, y = ~variance, name = "Garch Model", 
         type = "scatter", mode = "lines", 
         line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
-layout(title = names$name,
-       xaxis = list(title = "Years"),
-       yaxis = list (title = names$yaxis))
+add_trace(y = ~rm_variance, name = "RiskMetrics Model", 
+          line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
+layout(title = "Main Data Daily Variance Comparison",
+       xaxis = list(title = "Year"),
+       yaxis = list(title = "Variance"))
 
+plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch", 
+        type = "scatter", mode = "lines", 
+        line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
+add_trace(y = ~rm_VaR, name = "VaR from RiskMetrics", 
+          line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
+layout(title = "Main Data Daily VaR Comparison",
+       xaxis = list(title = "Year"),
+       yaxis = list(title = "VaR"))
 
+# graph variance, VaR for comparison data
+time = c(1:nrow(garch_c))
+year = substr(garch_c[1,"DATE"],7,10)
+year = as.numeric(year)
+time = time/252 + year
+data = data.frame(garch_c,time)
+data$rm_variance = oneday_c$variance
+data$rm_VaR = oneday_c$VaR
+names = list("variance" = "Main Garch Model Variance",
+             "yaxis1" = "Variance of Returns",
+             "var" = "VaR from Garch Model",
+             "yaxis2" = "VaR")
+
+plot_ly(data, x = ~time, y = ~variance, name = "Garch Model", 
+        type = "scatter", mode = "lines", 
+        line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
+  add_trace(y = ~rm_variance, name = "RiskMetrics Model", 
+            line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
+  layout(title = "Main Data Daily Variance Comparison",
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "Variance"))
+
+plot_ly(data, x = ~time, y = ~VaR, name = "VaR from Garch", 
+        type = "scatter", mode = "lines", 
+        line = list(color = 'rgb(205, 12, 24)', width = 1.5)) %>%
+  add_trace(y = ~rm_VaR, name = "VaR from RiskMetrics", 
+            line = list(color = 'rgb(22, 96, 167)', width = 1.5)) %>%
+  layout(title = "Main Data Daily VaR Comparison",
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "VaR"))
 
 
