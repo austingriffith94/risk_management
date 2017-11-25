@@ -9,16 +9,21 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/Austin/GIT_profile/risk_management")
+getwd()
+library(fGarch)
+library(plotly)
+packageVersion('plotly')
 ```
 
-# Risk Management
+# Risk Management 
 
 This code models the risk of a randomly selected set of 100 firms stocks. The time period over which the firms are analyzed were for 2005 to 2010, and compared with values determined from 2000 to 2010.
 
 The SAS code used to pull the data from the DSF data file will be provided. The data cleaning using SAS was stopped once the 100 firms were selected for each set of years. For the risk models, historical data was used to determine a starting point. As seen in the SAS code, the historical data was used from the prior year (in this case, 2004 and 1999).
 
 
-## Importing the Data
+### Importing the Data
 
 For the first step, the data was imported from the csv files. These csv's had the returns, date and firm permanent number for the random 100 firms pulled from the dsf files.
 
@@ -27,11 +32,6 @@ It was assumed that there was $1 million invested into each firm, leading to the
 The data importing step was created using a function that takes a file name and reads the data in. This simplified the importing process for multiple files.
 
 ```{r read}
-# set working directory
-# needs to be adjusted when on new computer
-setwd("C:/Users/Austin/GIT_profile/risk_management")
-getwd()
-
 # import data
 # returns are in %
 # sum return percentages by day
@@ -77,7 +77,7 @@ data_mh = read_func(file3,invest)
 data_ch = read_func(file4,invest)
 ```
 
-## Histogram of Returns
+### Histogram of Returns
 
 Once the data was pulled from the csv's, returns were graphed to view the historical distributions with a normal distribution overlay. This was used to test that the return data was imported properly, and view the normality of the returns. 
 
@@ -106,7 +106,7 @@ vec_histogram(data_m$returns[["RET"]], hist_label_m)
 vec_histogram(data_c$returns[["RET"]], hist_label_c)
 ```
 
-## VaR, $VaR and Expected Shortfall
+### VaR, $VaR and Expected Shortfall
 
 VaR was the first of the calculations used to determine the risk of the randomly chosen firms. The $VaR was calculated simultaneously in the same function. Both of these risk metrics require a confidence interval with which to measure the downside risk. For this particular case, 95% confidence was chosen.
 
@@ -149,7 +149,7 @@ The expected shortfall (ES) for each time period shows how the lower bound tails
 
 The ES for the comparison period is 1.9%. That makes the difference between VaR and ES for each period less than 1%. The relatively small difference between values shows that the returns over the period were not so extreme as to make a large jump in losses should the VaR be passed. This is reinforced by the distribution returns shown above. There are few outliers on the lower bound tails.
 
-## Daily Models
+### Daily Models
 
 Both of the functions below capture the day by day swing of the variance, VaR and ES of the periods. 
 
@@ -199,8 +199,6 @@ The second function uses the GARCH model. The function is structurally similar i
 The function also uses a historical data set to determine the initial variance of the model.
 
 ```{r garch}
-library(fGarch)
-
 # garch model
 garch_f <- function(returns,hist_returns,a)
 {
@@ -211,7 +209,7 @@ garch_f <- function(returns,hist_returns,a)
   
   # function to solve for garch model variables
   x.g = garchFit(~garch(1,1),returns[["RET"]])
-  summary(x.g)
+  # summary(x.g)
   coef(x.g)
   
   # variables for loop and garch model
@@ -244,7 +242,7 @@ garch_m = garch_f(data_m$returns,data_mh$returns,conf)
 garch_c = garch_f(data_c$returns,data_ch$returns,conf)
 ```
 
-# Plotting of Daily Data
+### Plotting of Daily Data
 
 ```{r plotting}
 
