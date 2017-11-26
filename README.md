@@ -49,6 +49,17 @@ where
 ## Risk Models
 ### RiskMetrics Model
 
+JP Morgan's RiskMetrics variance model, also known as exponential smoother, is a method used to estimate the variance over a period of time using returns data. It can be used a predictive method of variance for the following day.
+
+The model can be expressed by the following equation:
+
+    σ^2_t+1 = λ * σ^2_t + (1-λ) * r^2_t
+
+where
+- σ^2_t+1 is the variance for the next interval of time
+- λ is the coefficient for the model; JP Morgan has determined this value to be 0.94 for most assets across all asset classes
+- r^2_t is the return for the current time
+- σ^2_t is the variance for the current time
 
 
 ## File Explanation
