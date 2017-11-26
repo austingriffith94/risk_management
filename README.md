@@ -16,17 +16,28 @@ where
 
 Based on this probability relationship, VaR can be solved by the expression:
 
-    VaR = -σ * φ-1(p)
+    VaR = -σ * Φ-1(p)
     $VaR = VaR * Vpf
 
 where
+- p is the percentage confidence for the interval
 - σ is the volatility of returns over the period being observed
-- φ-1(p) is the number such that 100% of the probability mass is below p
+- Φ-1(p) is the cumulative density function, and represents the number such that 100% of the probability mass is below p
 - Vpf is the value of the portfolio at risk
 
 ### Expected Shortfall
 
-    Pr($Loss > $VaR) = p
+Expected shortfall (ES), or 'TailVaR', accounts for the magnitude of large losses as well as their probability of occurring. The ES tells us the expected value of tomorrow’s loss, conditional on it being worse than the VaR. The ES computes the average of the tail outcomes weighted by their probabilities.
+
+ES can be expressed by the following equation:
+
+    ES = σ * φ(Φ-1(p))/p
+
+where
+- p is the percentage confidence for the interval
+- σ is the volatility of returns over the period being observed
+- Φ-1(p) is the cumulative density function, and represents the number such that 100% of the probability mass is below p
+- φ is the density function
 
 ## File Explanation
 #### DSF_cleaner.sas
