@@ -38,13 +38,13 @@ where
 
 Due to this conditional relationship between returns and VaR, ES can be solved for by the following equation:
 
-    ES = σ * φ(Φ-1(p))/p
+    ES = σ * ϕ(Φ-1(p))/p
 
 where
 - p is the percentage confidence for the interval
 - σ is the volatility of returns over the period being observed
 - Φ-1(p) is the cumulative density function, and represents the number such that 100% of the probability mass is below p
-- φ is the density function
+- ϕ is the density function
 
 ## Risk Models
 ### RiskMetrics Model
@@ -57,10 +57,29 @@ The model can be expressed by the following equation:
 
 where
 - σ^2_t+1 is the variance for the next interval of time
-- λ is the coefficient for the model; JP Morgan has determined this value to be 0.94 for most assets across all asset classes
+- λ is the coefficient for the model
 - r^2_t is the return for the current time
 - σ^2_t is the variance for the current time
 
+RiskMetrics found that the estimates were quite similar across assets, and they simply set the model coefficient to 0.94 for every asset for daily variance forecasting.
+
+### GARCH Model
+
+The GARCH model is structuraly similar in its estimation of variance. However, it contains a number of unknown parameters that must be estimated. The simplest model of dynamic variance GARCH is known as GARCH(1,1), which can be described by the equation:
+
+    σ^2_t+1 = ω + α * σ^2_t + β * r^2_t
+
+where
+- σ^2_t+1 is the variance for the next interval of time
+- ω is the drift constant for the model
+- α is the coefficient for variance
+- β is the coefficient for squared returns
+- r^2_t is the return for the current time
+- σ^2_t is the variance for the current time
+
+The persistence of variance in this model is α + β = 0.999, which is only slightly lower than RiskMetrics (which is 1). This difference leads to significant discrepencies between the two models.
+
+RiskMetrics can be seen as a simple version of GARCH(1,1), where α + β = 1 with no drift constant.
 
 ## File Explanation
 #### DSF_cleaner.sas
