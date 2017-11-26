@@ -16,9 +16,13 @@ where
 
 Based on this probability relationship, VaR can be solved by the expression:
 
-    VaR = -σ * φ<sup>-1</sup>(p)
+    VaR = -σ * φ-1(p)
+    $VaR = VaR * Vpf
 
-instead calculates the number such that p.100% of the probability mass is below
+where
+- σ is the volatility of returns over the period being observed
+- φ-1(p) is the number such that 100% of the probability mass is below p
+- Vpf is the value of the portfolio at risk
 
 ### Expected Shortfall
 
