@@ -5,16 +5,16 @@ The risk management folder solves for VaR, $VaR, expected shortfall, and varianc
 ## Risk Measures
 ### VaR and $VaR
 
-VaR is a measure of the potential loss from extreme negative returns within a certain confidence. $VaR is a measure of the potential loss of value from an extreme negative return. Both values can be expressed by the following equations:
+VaR is a measure of the potential loss from extreme negative returns within a certain confidence. $VaR is a measure of the potential loss of value from an extreme negative return. Both values can be expressed by the following relationship:
 
     Pr(r > -VaR) = p
     Pr($Loss > $VaR) = p
 
 where
 - p is the percentage confidence for the interval
-- r is the returns
+- r is the returns over the period being observed
 
-Based on this probability relationship, VaR can be solved by the expression:
+Based on this probability relationship, VaR can be solved by the equation:
 
     VaR = -σ * Φ-1(p)
     $VaR = VaR * Vpf
@@ -29,7 +29,14 @@ where
 
 Expected shortfall (ES), or 'TailVaR', accounts for the magnitude of large losses as well as their probability of occurring. The ES tells us the expected value of tomorrow’s loss, conditional on it being worse than the VaR. The ES computes the average of the tail outcomes weighted by their probabilities.
 
-ES can be expressed by the following equation:
+ES can be expressed by the following relationship:
+
+    ES = -E[r | r < -VaR]
+
+where
+- r is the returns over the period being observed
+
+Due to this conditional relationship between returns and VaR, ES can be solved for by the following equation:
 
     ES = σ * φ(Φ-1(p))/p
 
@@ -38,6 +45,11 @@ where
 - σ is the volatility of returns over the period being observed
 - Φ-1(p) is the cumulative density function, and represents the number such that 100% of the probability mass is below p
 - φ is the density function
+
+## Risk Models
+### RiskMetrics Model
+
+
 
 ## File Explanation
 #### DSF_cleaner.sas
