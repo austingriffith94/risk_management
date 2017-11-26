@@ -2,6 +2,28 @@
 
 The risk management folder solves for VaR, $VaR, expected shortfall, and variance for two periods of time. There are also calculations of the Garch model and RiskMetrics model for daily variance, VaR and expected shortfall. The current sets of data provided are for 2005-2010, and 2000-2010 for comparisons.
 
+## Risk Measures
+### VaR and $VaR
+
+VaR is a measure of the potential loss from extreme negative returns within a certain confidence. $VaR is a measure of the potential loss of value from an extreme negative return. Both values can be expressed by the following equations:
+
+    Pr(r > -VaR) = p
+    Pr($Loss > $VaR) = p
+
+where
+- p is the percentage confidence for the interval
+- r is the returns
+
+Based on this probability relationship, VaR can be solved by the expression:
+
+    VaR = -σ * φ<sup>-1</sup>(p)
+
+instead calculates the number such that p.100% of the probability mass is below
+
+### Expected Shortfall
+
+    Pr($Loss > $VaR) = p
+
 ## File Explanation
 #### DSF_cleaner.sas
 The sas file cleans the data from the DSF file used for the modeling and risk measures. It can be altered to pull from any period of time should there be a desire to compare another set to two time periods.
