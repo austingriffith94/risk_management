@@ -6,7 +6,7 @@ OPTIONS ls = 70 nodate nocenter;
 OPTIONS missing = '';
 
 /*file paths need to be updated according to current computer*/
-%let Ppath = P:\Assignment 7;
+%let Ppath = P:\Risk;
 %let Dpath = Q:\Data-ReadOnly\CRSP;
 
 libname comp "&Cpath";
@@ -27,7 +27,7 @@ run;
 
 /*data for random time period*/
 data dsf;
-set dsf_comp;
+set dsf_input;
 if YEAR < 2005 then delete;
 run;
 
