@@ -1,6 +1,6 @@
 # risk_management
 
-The risk management folder solves for VaR, $VaR, expected shortfall, and variance for two periods of time. There are also calculations of the Garch model and RiskMetrics model for daily variance, VaR and expected shortfall. The current sets of data provided are for 2005-2010, and 2000-2010 for comparisons.
+This risk management folder solves for VaR, $VaR, expected shortfall, and variance for two periods of time. There are also calculations of the Garch model and RiskMetrics model for daily variance, VaR and expected shortfall. The current sets of data provided are for 2005-2010, and 2000-2010 for comparisons. The main data set that the .sas code pulls from can be found at the link [here.](https://goo.gl/DoHABj)
 
 ## Risk Measures
 ### VaR and $VaR
