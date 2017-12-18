@@ -9,7 +9,6 @@ OPTIONS missing = '';
 %let Ppath = P:\Risk;
 %let Dpath = Q:\Data-ReadOnly\CRSP;
 
-libname comp "&Cpath";
 libname crsp "&Dpath";
 libname risk "&Ppath";
 
